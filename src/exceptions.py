@@ -12,3 +12,7 @@ class FlagError(Exception):
 
 class InvalidFormatError(Exception):
     pass
+
+
+class FileAlreadyExistsError(Exception):
+    pass

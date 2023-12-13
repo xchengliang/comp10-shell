@@ -8,5 +8,3 @@ class Cd(Command):
         if args:
             Validator.check_path_exists(args[0])
             os.chdir(args[0])
-        else:
-            raise ValueError #TODO(value or flag error)

@@ -9,7 +9,7 @@ class Head(Command):
     def validate_flags(args, stdIn):
         num_args = len(args) if args else 0
         n = 10
-        if num_args == 0:
+        if num_args == 0 and stdIn is not None:
             lines = stdIn
         elif num_args == 1:
             Validator.check_path_exists(args[0])

@@ -1,15 +1,17 @@
-from commands.echo import Echo
-from commands.pwd import Pwd
-from commands.ls import Ls
-from commands.cd import Cd
 from commands.cat import Cat
-from commands.head import Head
-from commands.tail import Tail
-from commands.grep import Grep
-from commands.find import Find
-from commands.sort import Sort
-from commands.uniq import Uniq
+from commands.cd import Cd
 from commands.cut import Cut
+from commands.echo import Echo
+from commands.find import Find
+from commands.grep import Grep
+from commands.head import Head
+from commands.ls import Ls
+from commands.mkdir import Mkdir
+from commands.pwd import Pwd
+from commands.sort import Sort
+from commands.tail import Tail
+from commands.uniq import Uniq
+from commands.wc import Wc
 from exceptions import CommandNotFoundError
 
 
@@ -27,7 +29,9 @@ class CommandFactory:
             "find": Find,
             "sort": Sort,
             "uniq": Uniq,
-            "cut": Cut
+            "cut": Cut,
+            "wc": Wc,
+            "mkdir": Mkdir
         }
 
     def get_command(self, cmd):

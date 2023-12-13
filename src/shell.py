@@ -27,13 +27,11 @@ def non_interactive_mode(args):
         print(out.popleft(), end="")
 
 
-def interactive_mode(flag=False):
+def interactive_mode():
     print(os.getcwd() + "> ", end="")
     out = eval(input())
     while len(out) > 0:
         print(out.popleft(), end="")
-        if flag:
-            break
 
 
 def main():

@@ -1,8 +1,10 @@
-from commandFactory import CommandFactory
 from collections import deque
-from utility import File
-from exceptions import MultipleRedirectionError
+
+from commandFactory import CommandFactory
 from exceptions import CommandNotFoundError
+from exceptions import MultipleRedirectionError
+from utility import File
+from utility import Validator
 
 
 class CommandHandler:
@@ -17,7 +19,12 @@ class CommandHandler:
         args = command_dict['arguments']
         inputFile = command_dict['inputFile']
         if inputFile is not None and len(inputFile) == 1:
-            inputFile = File(inputFile[0]).read_lines()
+            if Validator.check_path_exists_bool(inputFile[0]):
+                inputFile = File(inputFile[0]).read_lines()
+            elif cmd.startswith('_'):
+                inputFile = inputFile[0]
+            else:
+                Validator.check_path_exists(inputFile[0])
         elif inputFile is not None:
             inputFile = 'raise_error'
         outputFile = command_dict['outputFile']
@@ -43,15 +50,20 @@ class CommandHandler:
     def echo_sub(self, command_dict, dict_call, sub_output, index):
         for sub_index in command_dict['subcommands']:
             if 0 < sub_index < len(dict_call[1]) - 1:
-                dict_call[1] = self.get_new_arg_echo_sub(dict_call, sub_output, sub_index)
+                dict_call[1] = self.get_new_arg_echo_sub(dict_call,
+                                                         sub_output, sub_index)
             else:
-                dict_call[1] = dict_call[1][:index] + [arg[0] for arg in sub_output] + dict_call[1][index + 1:]
+                dict_call[1] = (dict_call[1][:index] + [f"'{arg[0]}'" for arg
+                                                        in sub_output] +
+                                dict_call[1][index + 1:])
 
-    def handle_substituted_arg(self, command_dict, dict_call, sub_output, index):
+    def handle_substituted_arg(self, command_dict, dict_call, sub_output,
+                               index):
         if command_dict['cmd'] == 'echo':
             self.echo_sub(command_dict, dict_call, sub_output, index)
         else:
-            dict_call[1] = dict_call[1][:index] + sub_output[0] + dict_call[1][index + 1:]
+            dict_call[1] = dict_call[1][:index] + sub_output[0] + dict_call[1][
+                                                                  index + 1:]
 
     def pipe(self, pipe, dict_call):
         if pipe and dict_call[2] is None:
@@ -65,28 +77,31 @@ class CommandHandler:
                 self.pipe(pipe, dict_call)
 
                 if isinstance(command_dict['cmd'], list):
-                    dict_call[0] = self.handle_substituted_cmd(command_dict['cmd'])
+                    dict_call[0] = self.handle_substituted_cmd(
+                        command_dict['cmd'])
 
                 if command_dict['subcommands'] is not None:
                     for index in command_dict['subcommands']:
                         sub_call = command_dict['subcommands'][index]
                         sub_output = self.process_sub_call(sub_call)
-                        self.handle_substituted_arg(command_dict, dict_call, sub_output, index)
+                        self.handle_substituted_arg(command_dict, dict_call,
+                                                    sub_output, index)
 
                 output = self.run_call(dict_call)
                 if dict_call[3] is not None and len(dict_call[3]) == 1:
                     File(dict_call[3][0]).write(output)
                 else:
-                    pipe.append(output.strip() if output is not None else output)
+                    pipe.append(
+                        output.strip() if output is not None else output)
 
             if pipe:
-                out.append(pipe[-1]+'\n' if pipe[-1] is not None else pipe[-1])
+                out.append(
+                    pipe[-1] + '\n' if pipe[-1] is not None else pipe[-1])
 
     def process_sub_call(self, commands):
         out = []
         self.process(commands, out)
         out = [line.strip('\n').split('\n') for line in out]
-        # print(out)
         return out
 
     def process_call(self, commands):
@@ -115,6 +130,8 @@ class CommandHandler:
         stdOut_error = "Error: Multiple Output Redirections given"
         if stdIn == "raise_error":
             raise MultipleRedirectionError(stdIn_error)
+        elif isinstance(stdIn, str):
+            Validator.check_path_exists(stdIn)
         if stdOut is not None and len(stdOut) != 1:
             raise MultipleRedirectionError(stdOut_error)
 

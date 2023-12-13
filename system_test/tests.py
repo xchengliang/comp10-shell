@@ -1,11 +1,9 @@
-import sys
-import unittest
-import subprocess
 import re
+import subprocess
+import unittest
 
 
 class TestShell(unittest.TestCase):
-
     SHELL_IMAGE = "comp0010-system-test"
     TEST_VOLUME = "comp0010-test-volume"
     TEST_IMAGE = "comp0010-test-image"
@@ -30,7 +28,8 @@ class TestShell(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        dockerfile = ("FROM " + cls.SHELL_IMAGE + "\nWORKDIR " + cls.TEST_DIR).encode()
+        dockerfile = (
+                    "FROM " + cls.SHELL_IMAGE + "\nWORKDIR " + cls.TEST_DIR).encode()
         args = ["docker", "build", "-t", cls.TEST_IMAGE, "-"]
         p = subprocess.run(args, input=dockerfile, stdout=subprocess.DEVNULL)
         if p.returncode != 0:
@@ -40,7 +39,8 @@ class TestShell(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         p = subprocess.run(
-            ["docker", "image", "rm", cls.TEST_IMAGE], stdout=subprocess.DEVNULL
+            ["docker", "image", "rm", cls.TEST_IMAGE],
+            stdout=subprocess.DEVNULL
         )
         if p.returncode != 0:
             print("error: failed to remove test image")
@@ -48,7 +48,8 @@ class TestShell(unittest.TestCase):
 
     def setUp(self):
         p = subprocess.run(
-            ["docker", "volume", "create", self.TEST_VOLUME], stdout=subprocess.DEVNULL
+            ["docker", "volume", "create", self.TEST_VOLUME],
+            stdout=subprocess.DEVNULL
         )
         if p.returncode != 0:
             print("error: failed to create test volume")
@@ -73,7 +74,8 @@ class TestShell(unittest.TestCase):
 
     def tearDown(self):
         p = subprocess.run(
-            ["docker", "volume", "rm", self.TEST_VOLUME], stdout=subprocess.DEVNULL
+            ["docker", "volume", "rm", self.TEST_VOLUME],
+            stdout=subprocess.DEVNULL
         )
         if p.returncode != 0:
             print("error: failed to remove test volume")
@@ -362,41 +364,41 @@ class TestShell(unittest.TestCase):
             result, {"dir1/file1.txt", "dir1/file2.txt", "dir1/longfile.txt"}
         )
 
-    # def test_wc(self):
-    #     cmdline = "wc dir1/file1.txt"
-    #     stdout = self.eval(cmdline)
-    #     result = stdout.strip().split()
-    #     self.assertEqual(result, ["3", "3", "12"])
+    def test_wc(self):
+        cmdline = "wc dir1/file1.txt"
+        stdout = self.eval(cmdline)
+        result = stdout.strip().split()
+        self.assertEqual(result, ["3", "3", "12"])
 
-    # def test_wc_stdin(self):
-    #     cmdline = "wc < dir1/file1.txt"
-    #     stdout = self.eval(cmdline)
-    #     result = stdout.strip().split()
-    #     self.assertEqual(result, ["3", "3", "12"])
+    def test_wc_stdin(self):
+        cmdline = "wc < dir1/file1.txt"
+        stdout = self.eval(cmdline)
+        result = stdout.strip().split()
+        self.assertEqual(result, ["3", "3", "12"])
 
-    # def test_wc_m(self):
-    #     cmdline = "wc -m < dir1/file1.txt"
-    #     stdout = self.eval(cmdline)
-    #     result = stdout.strip()
-    #     self.assertEqual(result, "12")
+    def test_wc_m(self):
+        cmdline = "wc -m < dir1/file1.txt"
+        stdout = self.eval(cmdline)
+        result = stdout.strip()
+        self.assertEqual(result, "12")
 
-    # def test_wc_w(self):
-    #     cmdline = "wc -w < dir1/file1.txt"
-    #     stdout = self.eval(cmdline)
-    #     result = stdout.strip()
-    #     self.assertEqual(result, "3")
+    def test_wc_w(self):
+        cmdline = "wc -w < dir1/file1.txt"
+        stdout = self.eval(cmdline)
+        result = stdout.strip()
+        self.assertEqual(result, "3")
 
-    # def test_wc_l(self):
-    #     cmdline = "wc -l < dir1/file1.txt"
-    #     stdout = self.eval(cmdline)
-    #     result = stdout.strip()
-    #     self.assertEqual(result, "3")
+    def test_wc_l(self):
+        cmdline = "wc -l < dir1/file1.txt"
+        stdout = self.eval(cmdline)
+        result = stdout.strip()
+        self.assertEqual(result, "3")
 
-    # def test_wc_files(self):
-    #     cmdline = "wc -l dir1/file1.txt dir1/file2.txt"
-    #     stdout = self.eval(cmdline)
-    #     result = stdout.strip()
-    #     self.assertEqual(result, "4")
+    def test_wc_files(self):
+        cmdline = "wc -l dir1/file1.txt dir1/file2.txt"
+        stdout = self.eval(cmdline)
+        result = stdout.strip()
+        self.assertEqual(result, "4")
 
     def test_input_redirection(self):
         cmdline = "cat < dir1/file2.txt"

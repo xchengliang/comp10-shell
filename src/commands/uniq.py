@@ -9,7 +9,7 @@ class Uniq(Command):
     def validate_args(args, stdIn):
         num_args = 0 if args is None else len(args)
         case_insensitive = False
-        if num_args == 0:
+        if num_args == 0 and stdIn is not None:
             lines = stdIn
         elif num_args == 1:
             if args[0].startswith('-'):
